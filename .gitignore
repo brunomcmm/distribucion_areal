@@ -1,0 +1,13 @@
+# Ignorar arquivos temporários
+*.pyc
+__pycache__/
+
+# Ignorar a pasta .vscode (configurações do VS Code)
+.vscode/
+
+# Ignorar arquivos temporários do sistema
+*.swp
+*.swo
+*.log
+*.tmp
+tempfile/
