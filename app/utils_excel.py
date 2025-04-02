@@ -3,36 +3,46 @@ import tempfile
 import os
 
 
-def leer_excel_ou_csv(archivo, sheet_name=None, skiprows=None):
+def leer_excel(archivo):
     """
-    Lê um arquivo Excel (.xls, .xlsx) ou CSV (.csv) e retorna um DataFrame.
-    Se for Excel, pode usar sheet_name e skiprows.
+    Lee un archivo Excel y retorna un DataFrame (primera hoja por defecto).
     """
     try:
-        if archivo.name.endswith('.csv'):
-            return pd.read_csv(archivo, skiprows=skiprows)
-        else:
-            return pd.read_excel(archivo, sheet_name=sheet_name, skiprows=skiprows)
+        return pd.read_excel(archivo)
     except Exception as e:
-        raise ValueError(f"Erro ao ler o arquivo: {e}")
+        raise ValueError(f"No se pudo leer el archivo Excel: {e}")
 
 
 def leer_conexiones(archivo):
     """
-    Lê a aba 'CONNECTION' de um arquivo Excel ou todo o CSV.
+    Lee la hoja 'CONNECTION' de un archivo Excel con múltiples hojas.
     """
     try:
-        return leer_excel_ou_csv(archivo, sheet_name="CONNECTION")
+        df = pd.read_excel(archivo, sheet_name="CONNECTION")
+        return df
     except Exception as e:
         raise ValueError(f"No se pudo leer la hoja 'CONNECTION': {e}")
 
 
-def leer_datos_volumetricos_formatados(archivo):
+def guardar_excel_temporal(df):
     """
-    Lê dados volumétricos formatados a partir de um Excel ou CSV.
+    Guarda un DataFrame como archivo Excel temporal y retorna la ruta.
     """
     try:
-        df_raw = leer_excel_ou_csv(archivo, skiprows=6)
+        temp_dir = tempfile.gettempdir()
+        ruta_archivo = os.path.join(temp_dir, "resultado.xlsx")
+        df.to_excel(ruta_archivo, index=False)
+        return ruta_archivo
+    except Exception as e:
+        raise ValueError(f"No se pudo guardar el archivo Excel: {e}")
+
+
+def leer_datos_volumetricos_formatados(caminho_excel):
+    """
+    Lee un archivo Excel con múltiples bloques de datos por pozo y lo reorganiza en formato largo.
+    """
+    try:
+        df_raw = pd.read_excel(caminho_excel, skiprows=6)
 
         nombres_pozos = df_raw.iloc[0, 1::3].tolist()
         columnas_datos = df_raw.iloc[1, 1:4].tolist()
@@ -56,16 +66,3 @@ def leer_datos_volumetricos_formatados(archivo):
 
     except Exception as e:
         raise ValueError(f"Error al procesar datos volumétricos: {e}")
-
-
-def guardar_excel_temporal(df):
-    """
-    Salva um DataFrame como Excel temporário e retorna o caminho.
-    """
-    try:
-        temp_dir = tempfile.gettempdir()
-        ruta_archivo = os.path.join(temp_dir, "resultado.xlsx")
-        df.to_excel(ruta_archivo, index=False)
-        return ruta_archivo
-    except Exception as e:
-        raise ValueError(f"No se pudo guardar el archivo Excel: {e}")
