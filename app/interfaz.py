@@ -1,13 +1,13 @@
 import os
 import streamlit as st
 from app.procesador import procesar_archivos
-from app.utils_excel import leer_conexiones, leer_excel, guardar_excel_temporal, leer_datos_volumetricos_formatados
+from app.utils_excel import leer_conexiones, leer_datos_volumetricos_formatados, guardar_excel_temporal
 
 def mostrar_interfaz():
-    st.write("Sube dos archivos Excel y genera una salida procesada con la opción de descargarla.")
+    st.write("Sube dos archivos Excel o CSV y genera una salida procesada con la opción de descargarla.")
 
-    archivo1 = st.file_uploader("Selecciona el archivo Excel (con hoja 'CONNECTION')", type=[".xlsx", ".xls"])
-    archivo2 = st.file_uploader("Selecciona el archivo Excel (volúmenes por pozo)", type=[".xlsx", ".xls"])
+    archivo1 = st.file_uploader("Selecciona el archivo Excel o CSV (con hoja 'CONNECTION')", type=[".xlsx", ".xls", ".csv"])
+    archivo2 = st.file_uploader("Selecciona el archivo Excel o CSV (volúmenes por pozo)", type=[".xlsx", ".xls", ".csv"])
 
     df_conexiones = None
     df_volumenes  = None
@@ -20,11 +20,9 @@ def mostrar_interfaz():
             columnas_mostradas = ["INJECTOR", "PRODUCER", "WELL_TYPE", "DIST_BYPROD"]
             columnas_disponibles = [col for col in columnas_mostradas if col in df_conexiones.columns]
 
+            # Vista previa opcional
             # if columnas_disponibles:
-            #     st.markdown("### Vista previa del archivo 1 - Hoja 'CONNECTION'")
             #     st.dataframe(df_conexiones[columnas_disponibles].head(10))
-            # else:
-            #     st.warning("No se encontraron las columnas esperadas en la hoja 'CONNECTION'.")
 
         except Exception as e:
             st.error(f"Error al leer la hoja 'CONNECTION': {e}")
@@ -35,7 +33,7 @@ def mostrar_interfaz():
             df_volumenes.rename(columns={"POZO": "POZO INJECTOR"}, inplace=True)
             st.success("Archivo de volúmenes cargado correctamente.")
 
-            # st.markdown("### Vista previa del archivo 2 - Volúmenes por pozo")
+            # Vista previa opcional
             # st.dataframe(df_volumenes.head(10))
 
         except Exception as e:
